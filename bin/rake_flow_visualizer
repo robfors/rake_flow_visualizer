@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+# %% -*- ruby -*-
+
+require 'rake_flow_visualizer'
+
+RakeFlowVisualizer.run

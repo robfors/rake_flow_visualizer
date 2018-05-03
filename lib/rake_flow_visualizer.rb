@@ -1,9 +1,6 @@
-#!/usr/bin/env ruby
+require 'open3'
 
-
-require 'pry'
-require_relative "rake_flow_visualizer/task.rb"
-
+require 'rake_flow_visualizer/task'
 
 
 module RakeFlowVisualizer
@@ -36,16 +33,20 @@ module RakeFlowVisualizer
     task.dependencies.each { |dependency| print_task(depth + 1, dependency, ignore) }
   end
   
-end
-
-input = ""
-while true
-  begin
-    char = STDIN.sysread(1)
-    input += char
-  rescue EOFError
-    break
+  def self.run
+    _stdout, status = Open3.capture2('rake --help')
+    raise 'can not find rake, is it installed?' unless status.success?
+    stdout, status = Open3.capture2('rake -P')
+    unless status.success?
+      puts stdout
+      raise "executing 'rake -P' resulted in an exception"
+    end
+    puts "--- Rake Flow Visualizer ---"
+    puts "The following shows a list for every task that can be run."
+    puts "Each list will have the requisites for the task and the order that they will be executed."
+    puts
+    puts
+    parse(stdout)
   end
+  
 end
-
-RakeFlowVisualizer.parse(input)
